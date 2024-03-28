@@ -10,7 +10,4 @@ defmodule GetawaysWeb.Resolvers.Vacation do
     {:ok, Vacation.list_places(args)}
   end
 
-  def bookings_for_place(place, _, _) do
-    {:ok, Vacation.bookings_for_place(place)}
-  end
 end

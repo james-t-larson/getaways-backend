@@ -9,7 +9,7 @@ defmodule GetawaysWeb.Schema.Schema do
   query do
     @desc "Get a place by the slug"
     field :place, :place do
-      arg :slug, string, non_null(:string)
+      arg :slug, non_null(:string)
       resolve &Resolvers.Vacation.place/3
     end
 
@@ -54,7 +54,9 @@ defmodule GetawaysWeb.Schema.Schema do
     field :price_per_night, non_null(:decimal)
     field :image, non_null(:string)
     field :image_thumbnail, non_null(:string)
-    field :bookings, list_of(:booking)
+    field :bookings, list_of(:booking) do
+      resolve &Resolvers.Vacation.bookings_for_place/3
+    end
   end
 
   object :booking do

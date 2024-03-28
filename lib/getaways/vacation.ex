@@ -16,7 +16,7 @@ defmodule Getaways.Vacation do
   Raises `Ecto.NoResultsError` if no place was found.
   """
   def get_place_by_slug!(slug) do
-    Repo.get_by!(Place, slug: slug)
+    Repo.get_by!(Place, slug: slug) |> Repo.preload(:bookings)
   end
 
   @doc """
@@ -94,6 +94,13 @@ defmodule Getaways.Vacation do
             type(^end_date, :date)
           ),
       where: is_nil(booking.place_id)
+  end
+
+  def bookings_for_place(%Place{} = place) do
+    Booking
+    |> where(place_id: ^place.id)
+    |> where(state: "reserved")
+    |> Repo.all
   end
 
   @doc """

@@ -140,6 +140,18 @@ defmodule Getaways.Vacation do
     Dataloader.Ecto.new(Repo, query: &query/2)
   end
 
+  def query(Booking, %{scope: :place, limit: limit}) do
+    Booking
+    |> where(state: "reserved")
+    |> order_by([desc: :start_date])
+    |> limit(^limit)
+  end
+
+  def query(Booking, %{scope: :user}) do
+    Booking
+    |> order_by([asc: :start_date])
+  end
+
   def query(queryable, _) do
     queryable
   end

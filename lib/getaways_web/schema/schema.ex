@@ -4,23 +4,21 @@ defmodule GetawaysWeb.Schema.Schema do
 
   import_types Absinthe.Type.Custom
 
+  alias GetawaysWeb.Resolvers
+
   query do
     @desc "Get a place by the slug"
     field :place, :place do
       arg :slug, string, non_null(:string)
-      resolve fn _, %{slug: slug}, _ ->
-        {:ok, Vacation.get_place_by_slug!(slug)}
-      end
+      resolve &Resolvers.Vacation.place/3
     end
 
     @desc "Get a list of places"
     field :places, list_of(:place) do
-       arg :limit, :integer
-       arg :order, type: :sort_order, default_value: :asc
-       arg :filter,
-       resolve fn _, args, _ ->
-        {:ok, Vacation.list_places(args)}
-       end
+      arg :limit, :integer
+      arg :order, type: :sort_order, default_value: :asc
+      arg :filter, type: :place_filter
+      resolve &Resolvers.Vacation.places/3
     end
   end
 
@@ -56,6 +54,14 @@ defmodule GetawaysWeb.Schema.Schema do
     field :price_per_night, non_null(:decimal)
     field :image, non_null(:string)
     field :image_thumbnail, non_null(:string)
+    field :bookings, list_of(:booking)
   end
 
+  object :booking do
+    field :id, non_null(:id)
+    field :start_date, non_null(:date)
+    field :end_date, non_null(:date)
+    field :state, non_null(:string)
+    field :total_price, non_null(:decimal)
+  end
 end

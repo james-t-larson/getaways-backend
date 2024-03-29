@@ -23,6 +23,39 @@ defmodule GetawaysWeb.Schema.Schema do
     end
   end
 
+  mutation do
+    @desc "Create a booking for a place"
+    field :create_booking, :booking do
+      arg :place_id, non_null(:id)
+      arg :start_date, non_null(:date)
+      arg :end_date, non_null(:date)
+      resolve &Resolvers.Vacation.create_booking/3
+    end
+
+    @desc "Cancel a booking"
+    field :cancel_booking, :booking do
+      arg :booking_id, non_null(:id)
+      resolve &Resolvers.Vacation.cancel_booking/3
+    end
+
+    @desc "Create Review"
+    field :create_review, :review do
+      arg :place_id, non_null(:id)
+      arg :comment, :string
+      arg :rating, non_null(:integer)
+      resolve &Resolvers.Vacation.create_review/3
+    end
+
+    @desc "Create User account"
+    field :signup, :session do
+      arg :username, non_null(:string)
+      arg :email, non_null(:string)
+      arg :password, non_null(:string)
+      resolve &Resolvers.Accounts.signup/3
+    end
+
+  end
+
   input_object :place_filter do
     field :matching, :string
     field :wifi, :boolean
@@ -40,6 +73,11 @@ defmodule GetawaysWeb.Schema.Schema do
   enum :sort_order do
     value :asc
     value :desc
+  end
+
+  object :session do
+    field :user, non_null(:user)
+    field :token, non_null(:string)
   end
 
   object :place do
@@ -90,6 +128,7 @@ defmodule GetawaysWeb.Schema.Schema do
   end
 
   def context(ctx) do
+    ctx = Map.put(ctx, :current_user, Getaways.Accounts.get_user(1))
     loader =
       Dataloader.new
       |> Dataloader.add_source(Vacation, Vacation.datasource())

@@ -23,6 +23,10 @@ defmodule GetawaysWeb.Schema.Schema do
       resolve &Resolvers.Vacation.places/3
     end
 
+    @desc "Get the currently signed-in user"
+    field :me, :user do
+      resolve &Resolvers.Accounts.me/3
+    end
   end
 
   mutation do
@@ -67,6 +71,16 @@ defmodule GetawaysWeb.Schema.Schema do
     end
   end
 
+  subscription do
+    @desc "Subscribe to booking changes for a place"
+    field :booking_change, :booking do
+      arg :place_id, non_null(:id)
+      config fn args, _res ->
+        {:ok, topic: args.place_id}
+      end
+    end
+  end
+
   input_object :place_filter do
     field :matching, :string
     field :wifi, :boolean
@@ -87,6 +101,7 @@ defmodule GetawaysWeb.Schema.Schema do
   end
 
   object :session do
+    field :id, :integer
     field :user, non_null(:user)
     field :token, non_null(:string)
   end
@@ -131,6 +146,7 @@ defmodule GetawaysWeb.Schema.Schema do
   end
 
   object :user do
+    field :id, :integer
     field :username, non_null(:string)
     field :email, non_null(:string)
     field :bookings, list_of(:booking),
@@ -144,7 +160,9 @@ defmodule GetawaysWeb.Schema.Schema do
       |> Dataloader.add_source(Vacation, Vacation.datasource())
       |> Dataloader.add_source(Accounts, Accounts.datasource())
 
-    Map.put(ctx, :loader, loader)
+      ctx_with_loader = Map.put(ctx, :loader, loader)
+      IO.inspect(ctx_with_loader, label: "Context before returning:")
+      ctx_with_loader
   end
 
   def plugins do

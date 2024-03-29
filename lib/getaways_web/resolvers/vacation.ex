@@ -24,6 +24,14 @@ defmodule GetawaysWeb.Resolvers.Vacation do
     end
   end
 
+  defp publish_booking_change(booking) do
+    Absinthe.Subscription.publish(
+      GetawaysWeb.Endpoint,
+      booking,
+      booking_change: booking.place_id
+    )
+  end
+
   def cancel_booking(_, args, %{context: %{current_user: user}}) do
     booking = Vacation.get_booking!(args[:booking_id])
 
@@ -37,6 +45,7 @@ defmodule GetawaysWeb.Resolvers.Vacation do
           }
 
         {:ok, booking} ->
+          publish_booking_change(booking)
           {:ok, booking}
       end
     else
@@ -56,6 +65,7 @@ defmodule GetawaysWeb.Resolvers.Vacation do
         }
 
       {:ok, booking} ->
+        publish_booking_change(booking)
         {:ok, booking}
     end
   end

@@ -21,6 +21,7 @@ defmodule GetawaysWeb.Schema.Schema do
       arg :filter, type: :place_filter
       resolve &Resolvers.Vacation.places/3
     end
+
   end
 
   mutation do
@@ -54,6 +55,12 @@ defmodule GetawaysWeb.Schema.Schema do
       resolve &Resolvers.Accounts.signup/3
     end
 
+    @desc "Sign in a User"
+    field :signin, :session do
+      arg :username, non_null(:string)
+      arg :password, non_null(:string)
+      resolve &Resolvers.Accounts.signin/3
+    end
   end
 
   input_object :place_filter do
